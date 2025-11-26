@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Estacione Fácil",
+  "description": "A simulation of a smart parking application that manages vehicle entry and exit using randomly generated license plates, providing a real-time dashboard of parking lot statistics and a visual map of spaces.",
+  "requestFramePermissions": []
+}

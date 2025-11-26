@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Estacione Fácil",
+    "slug": "estacione-facil",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#3b82f6"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.estacionefacil.app"
+    },
+    "android": {
+      "package": "com.estacionefacil.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#3b82f6"
+      },
+      "permissions": []
+    },
+    "extra": {
+      "apiUrl": "https://seu-app.onrender.com/api"
+    }
+  }
+}

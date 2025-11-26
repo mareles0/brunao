@@ -1,0 +1,124 @@
+name: CI/CD - Estacione Fácil
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  frontend-build:
+    name: Build e Test Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Instalar dependências do frontend
+      run: npm ci
+      
+    - name: Verificar erros de TypeScript
+      run: npx tsc --noEmit
+      continue-on-error: false
+      
+    - name: Build do frontend
+      run: npm run build
+      
+    - name: Upload artefatos do build
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-dist
+        path: dist/
+        retention-days: 7
+
+  api-test:
+    name: Test API Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: api/package-lock.json
+        
+    - name: Instalar dependências da API
+      run: |
+        cd api
+        npm ci
+        
+    - name: Executar testes da API
+      run: |
+        cd api
+        npm test
+        
+    - name: Verificar se a API inicia corretamente
+      run: |
+        cd api
+        timeout 10s npm start || code=$?
+        if [ $code -eq 124 ]; then
+          echo "API iniciou com sucesso"
+          exit 0
+        else
+          echo "Erro ao iniciar API"
+          exit 1
+        fi
+
+  quality-check:
+    name: Verificação de Qualidade
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+      
+    - name: Verificar arquivos obrigatórios
+      run: |
+        echo "Verificando estrutura do projeto..."
+        [ -f "README.md" ] && echo "✓ README.md encontrado" || (echo "✗ README.md não encontrado" && exit 1)
+        [ -d "api" ] && echo "✓ Pasta api/ encontrada" || (echo "✗ Pasta api/ não encontrada" && exit 1)
+        [ -f "api/server.js" ] && echo "✓ API server.js encontrado" || (echo "✗ API server.js não encontrado" && exit 1)
+        [ -d ".github/workflows" ] && echo "✓ GitHub Actions configurado" || (echo "✗ GitHub Actions não configurado" && exit 1)
+        echo "✓ Todos os arquivos obrigatórios presentes"
+        
+    - name: Verificar convenção de commits (última mensagem)
+      run: |
+        LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+        echo "Última mensagem de commit: $LAST_COMMIT_MSG"
+        if echo "$LAST_COMMIT_MSG" | grep -qE "^(feat|fix|docs|style|refactor|test|chore):"; then
+          echo "✓ Commit segue convenção semântica"
+        else
+          echo "⚠ Commit não segue convenção semântica (feat:|fix:|docs:|etc)"
+          echo "Isso não impedirá o build, mas é recomendado seguir a convenção"
+        fi
+
+  deployment-ready:
+    name: Pronto para Deploy
+    runs-on: ubuntu-latest
+    needs: [frontend-build, api-test, quality-check]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+      
+    - name: Notificar sucesso
+      run: |
+        echo "=========================================="
+        echo "✓ Todos os testes passaram!"
+        echo "✓ Build do frontend concluído"
+        echo "✓ API testada com sucesso"
+        echo "✓ Verificações de qualidade OK"
+        echo "=========================================="
+        echo "Projeto pronto para deploy! 🚀"
