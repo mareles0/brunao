@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'http://192.168.100.36:3001/api';
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'https://brunao.onrender.com/api';
 
 class ApiService {
   constructor() {
@@ -13,6 +13,9 @@ class ApiService {
 
   async request(endpoint, options = {}) {
     try {
+      const url = `${API_BASE_URL}${endpoint}`;
+      console.log('API Request:', url);
+      
       const headers = {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -23,18 +26,21 @@ class ApiService {
         headers['Authorization'] = `Bearer ${this.authToken}`;
       }
 
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const response = await fetch(url, {
         headers,
+        timeout: 30000,
         ...options,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('API Error Response:', errorData);
         throw new Error(errorData.error || 'Erro na requisição');
       }
 
       return await response.json();
     } catch (error) {
+      console.error('API Request Failed:', error.message);
       throw error;
     }
   }
