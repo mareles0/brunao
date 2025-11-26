@@ -4,6 +4,7 @@
     "slug": "estacione-facil",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "resizeMode": "contain",
@@ -18,14 +19,18 @@
     },
     "android": {
       "package": "com.estacionefacil.app",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#3b82f6"
       },
-      "permissions": []
+      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"],
+      "usesCleartextTraffic": false
     },
     "extra": {
-      "apiUrl": "https://seu-app.onrender.com/api"
+      "apiUrl": "https://brunao.onrender.com/api",
+      "eas": {
+        "projectId": "4d6c0514-3115-43b2-8809-aecdea0906db"
+      }
     }
   }
 }

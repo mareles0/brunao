@@ -1,6 +1,9 @@
 import Constants from 'expo-constants';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || 'https://brunao.onrender.com/api';
+// Garantir que a URL seja sempre a do Render no APK
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl || Constants.manifest?.extra?.apiUrl || 'https://brunao.onrender.com/api';
+
+console.log('API_BASE_URL configurada:', API_BASE_URL);
 
 class ApiService {
   constructor() {
